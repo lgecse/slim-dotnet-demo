@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SlimDemo.Alice.Gui.MainWindow"
+        Title="SLIM Demo — Alice (.NET)"
+        Width="520" Height="480"
+        MinWidth="400" MinHeight="320">
+
+    <DockPanel Margin="16">
+        <!-- Header -->
+        <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,12">
+            <TextBlock Text="SLIM Demo: Alice (.NET Receiver)"
+                       FontSize="18" FontWeight="Bold" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Identity:" FontWeight="SemiBold" />
+                <TextBlock Text="org/alice/v1" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Status bar -->
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource SystemRegionBrush}"
+                CornerRadius="6" Padding="10,6" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Ellipse x:Name="StatusDot" Width="10" Height="10" Fill="Gray" />
+                <TextBlock x:Name="StatusText" Text="Disconnected" />
+            </StackPanel>
+        </Border>
+
+        <!-- Connect / Disconnect -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+            <Button x:Name="ConnectBtn" Content="Connect" Click="OnConnect" />
+            <Button x:Name="DisconnectBtn" Content="Disconnect" Click="OnDisconnect" IsEnabled="False" />
+        </StackPanel>
+
+        <!-- Message log -->
+        <Border CornerRadius="6" BorderBrush="{DynamicResource SystemBaseMediumLowColor}" BorderThickness="1">
+            <ScrollViewer x:Name="LogScroller">
+                <ItemsControl x:Name="MessageList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="6,2"
+                                       FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="13" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </DockPanel>
+</Window>

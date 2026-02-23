@@ -1,0 +1,105 @@
+---
+version: "3"
+
+silent: true
+
+vars:
+  SERVER_ENDPOINT: "http://localhost:46357"
+  SLIMCTL_VERSION: "1.0.0"
+
+tasks:
+  default:
+    desc: "List available demo tasks"
+    cmds:
+      - task -l
+
+  install:
+    desc: "One-time setup: restore .NET packages, download Go deps, slimctl, install native libs"
+    cmds:
+      - echo "==> Restoring .NET packages..."
+      - dotnet restore dotnet/SlimDemo.Alice.sln
+      - echo "==> Downloading Go dependencies..."
+      - cd go && go mod download all
+      - echo "==> Installing SLIM native libraries for Go (CGO)..."
+      - cd go && go run github.com/agntcy/slim-bindings-go/cmd/slim-bindings-setup
+      - task download:slimctl
+      - echo ""
+      - echo "Setup complete! Run 'task server', 'task alice', and 'task bob' in separate terminals."
+
+  download:slimctl:
+    desc: "Download slimctl binary for current platform (no data-plane build needed)"
+    cmds:
+      - mkdir -p .bin
+      - |
+        case "$(uname -s)" in
+          Darwin) OS=darwin ;;
+          Linux)  OS=linux ;;
+          MINGW*|MSYS*|CYGWIN*) OS=windows ;;
+          *) echo "Unsupported OS: $(uname -s)"; exit 1 ;;
+        esac
+        case "$(uname -m)" in
+          x86_64)  ARCH=amd64 ;;
+          arm64|aarch64) ARCH=arm64 ;;
+          *) echo "Unsupported arch: $(uname -m)"; exit 1 ;;
+        esac
+        VER="{{.SLIMCTL_VERSION}}"
+        if [ "$OS" = "windows" ]; then
+          URL="https://github.com/agntcy/slim/releases/download/slimctl-v${VER}/slimctl_${VER}_${OS}_${ARCH}.zip"
+          if [ ! -f .bin/slimctl.exe ] || [ ! -x .bin/slimctl.exe ]; then
+            echo "Downloading slimctl v${VER}..."
+            curl -sSL "$URL" -o /tmp/slimctl.zip && unzip -o /tmp/slimctl.zip -d .bin && rm /tmp/slimctl.zip
+          fi
+        else
+          URL="https://github.com/agntcy/slim/releases/download/slimctl-v${VER}/slimctl_${VER}_${OS}_${ARCH}.tar.gz"
+          if [ ! -f .bin/slimctl ] || [ ! -x .bin/slimctl ]; then
+            echo "Downloading slimctl v${VER}..."
+            curl -sSL "$URL" | tar -xz -C .bin slimctl
+            chmod +x .bin/slimctl
+          fi
+        fi
+        echo "slimctl ready in .bin/"
+
+  server:
+    desc: "Start the SLIM server via slimctl (Terminal 1) — no data-plane build"
+    cmds:
+      - task download:slimctl
+      - echo "=== Starting SLIM Server on {{.SERVER_ENDPOINT}} ==="
+      - |
+        if [ -f .bin/slimctl.exe ]; then
+          .bin/slimctl.exe slim start --config config/server-config.yaml
+        else
+          .bin/slimctl slim start --config config/server-config.yaml
+        fi
+
+  alice:
+    desc: "Run Alice (.NET CLI receiver) (Terminal 2)"
+    dir: dotnet
+    cmds:
+      - dotnet run --project SlimDemo.Alice -- {{.CLI_ARGS}}
+
+  alice:gui:
+    desc: "Run Alice (.NET GUI receiver) (Terminal 2)"
+    dir: dotnet
+    cmds:
+      - dotnet run --project SlimDemo.Alice.Gui -- {{.CLI_ARGS}}
+
+  bob:
+    desc: "Run Bob (Go sender) (Terminal 3)"
+    dir: go
+    cmds:
+      - go run . {{.CLI_ARGS}}
+
+  clean:
+    desc: "Revert to starting point: remove all build artifacts, bin/obj, slimctl, NuGet cache, Go cache"
+    cmds:
+      - echo "==> Removing .NET bin/obj folders..."
+      - rm -rf dotnet/SlimDemo.Alice/bin dotnet/SlimDemo.Alice/obj
+      - rm -rf dotnet/SlimDemo.Alice.Common/bin dotnet/SlimDemo.Alice.Common/obj
+      - rm -rf dotnet/SlimDemo.Alice.Gui/bin dotnet/SlimDemo.Alice.Gui/obj
+      - echo "==> Removing slimctl binary..."
+      - rm -rf .bin
+      - echo "==> Clearing NuGet cache (packages will be re-downloaded on install)..."
+      - dotnet nuget locals all --clear
+      - echo "==> Cleaning Go cache and native libs..."
+      - cd go && go clean -cache -modcache
+      - echo "Done. Run 'task install' to restore packages and setup."

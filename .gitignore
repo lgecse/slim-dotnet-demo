@@ -1,0 +1,6 @@
+# Downloaded slimctl binary
+.bin/
+
+# .NET build artifacts
+**/bin/
+**/obj/
