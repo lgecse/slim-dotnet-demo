@@ -20,14 +20,6 @@ const (
 	defaultIterations = 10
 )
 
-func parseName(id string) *slim.Name {
-	parts := strings.SplitN(id, "/", 3)
-	if len(parts) != 3 {
-		log.Fatalf("Invalid identity %q — expected org/namespace/app", id)
-	}
-	return slim.NewName(parts[0], parts[1], parts[2])
-}
-
 func main() {
 	remote := flag.String("remote", "org/alice/v1", "Remote ID (org/namespace/app)")
 	server := flag.String("server", defaultServer, "SLIM server endpoint")
@@ -35,15 +27,18 @@ func main() {
 	minNum := flag.Int("min", defaultMinNum, "Minimum random number")
 	maxNum := flag.Int("max", defaultMaxNum, "Maximum random number")
 	sharedSecret := flag.String("shared-secret", defaultSecret, "Shared secret (min 32 chars)")
+	noMls := flag.Bool("no-mls", false, "Disable MLS encryption (enabled by default)")
 
 	flag.Parse()
+
+	enableMls := !*noMls
 
 	fmt.Println("=== SLIM Demo: Bob (Go Sender) — Odd/Even ===")
 	fmt.Println()
 
 	slim.InitializeWithDefaults()
 
-	localName := parseName("org/bob/v1")
+	localName := slim.NewName("org", "bob", "v1")
 
 	app, err := slim.GetGlobalService().CreateAppWithSecret(localName, *sharedSecret)
 	if err != nil {
@@ -66,9 +61,14 @@ func main() {
 	fmt.Printf("  Remote   : %s\n", *remote)
 	fmt.Printf("  Conn ID  : %d\n", connID)
 	fmt.Printf("  Range    : %d–%d\n", *minNum, *maxNum)
+	fmt.Printf("  MLS      : %s\n", map[bool]string{true: "ENABLED", false: "disabled"}[enableMls])
 	fmt.Println()
 
-	remoteName := parseName(*remote)
+	remoteParts := strings.SplitN(*remote, "/", 3)
+	if len(remoteParts) != 3 {
+		log.Fatalf("Invalid remote %q — expected org/namespace/app", *remote)
+	}
+	remoteName := slim.NewName(remoteParts[0], remoteParts[1], remoteParts[2])
 
 	if err := app.SetRouteAsync(remoteName, connID); err != nil {
 		log.Fatalf("Failed to set route: %v", err)
@@ -77,6 +77,7 @@ func main() {
 
 	sessConfig := slim.SessionConfig{
 		SessionType: slim.SessionTypePointToPoint,
+		EnableMls:   enableMls,
 	}
 
 	fmt.Printf("Creating session to %s...\n", *remote)
@@ -87,7 +88,8 @@ func main() {
 	defer app.DeleteSessionAndWaitAsync(session)
 
 	time.Sleep(100 * time.Millisecond)
-	fmt.Println("Session created!")
+
+	fmt.Println("Ready!")
 	fmt.Println()
 
 	for i := 0; i < *iterations; i++ {

@@ -20,12 +20,15 @@ tasks:
       - dotnet restore dotnet/SlimDemo.sln
       - echo "==> Downloading Go dependencies..."
       - cd go && go mod download all
+      - cd go/mls-test && go mod download all
       - echo "==> Installing SLIM native libraries for Go (CGO)..."
       - cd go && go run github.com/agntcy/slim-bindings-go/cmd/slim-bindings-setup
+      - cd go/mls-test && go run github.com/agntcy/slim-bindings-go/cmd/slim-bindings-setup
       - task download:slimctl
       - echo ""
       - 'echo "Setup complete!"'
-      - 'echo "  Point-to-point: task server, task alice, task bob"'
+      - 'echo "  Point-to-point (MLS): task server, task alice, task bob"'
+      - 'echo "  MLS test:            task server, task mls-test:bob, task mls-test:alice"'
       - 'echo "  Group chat:     task server, then task group:gui in multiple terminals"'
 
   download:slimctl:
@@ -74,7 +77,7 @@ tasks:
         fi
 
   alice:
-    desc: "Run Alice (.NET CLI receiver) (Terminal 2)"
+    desc: "Run Alice (.NET CLI receiver, MLS encrypted) (Terminal 2)"
     dir: dotnet
     cmds:
       - dotnet run --project SlimDemo.Alice -- {{.CLI_ARGS}}
@@ -92,10 +95,28 @@ tasks:
       - dotnet run --project SlimDemo.Group.Gui -- {{.CLI_ARGS}}
 
   bob:
-    desc: "Run Bob (Go sender) (Terminal 3)"
+    desc: "Run Bob (Go sender, MLS encrypted) (Terminal 3) — use --no-mls to disable"
     dir: go
     cmds:
       - go run . {{.CLI_ARGS}}
+
+  mls-test:alice:
+    desc: "MLS test: Alice (.NET sender) — use --enable-mls to toggle MLS"
+    dir: dotnet
+    cmds:
+      - dotnet run --project SlimDemo.MlsTest -- {{.CLI_ARGS}}
+
+  mls-test:bob:
+    desc: "MLS test: Bob (Go receiver) — use --enable-mls to toggle MLS"
+    dir: go/mls-test
+    cmds:
+      - go run . {{.CLI_ARGS}}
+
+  mls-test:bob:dotnet:
+    desc: "MLS test: Bob (.NET receiver) — use --enable-mls to toggle MLS"
+    dir: dotnet
+    cmds:
+      - dotnet run --project SlimDemo.MlsTest.Bob -- {{.CLI_ARGS}}
 
   clean:
     desc: "Revert to starting point: remove all build artifacts, bin/obj, slimctl, NuGet cache, Go cache"
@@ -105,6 +126,8 @@ tasks:
       - rm -rf dotnet/SlimDemo.Common/bin dotnet/SlimDemo.Common/obj
       - rm -rf dotnet/SlimDemo.Alice.Gui/bin dotnet/SlimDemo.Alice.Gui/obj
       - rm -rf dotnet/SlimDemo.Group.Gui/bin dotnet/SlimDemo.Group.Gui/obj
+      - rm -rf dotnet/SlimDemo.MlsTest/bin dotnet/SlimDemo.MlsTest/obj
+      - rm -rf dotnet/SlimDemo.MlsTest.Bob/bin dotnet/SlimDemo.MlsTest.Bob/obj
       - echo "==> Removing slimctl binary..."
       - rm -rf .bin
       - echo "==> Clearing NuGet cache (packages will be re-downloaded on install)..."
