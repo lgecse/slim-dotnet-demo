@@ -3,7 +3,7 @@ using Agntcy.Slim;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
-using SlimDemo.Alice.Common;
+using SlimDemo.Common;
 
 namespace SlimDemo.Alice.Gui;
 

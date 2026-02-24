@@ -1,6 +1,6 @@
 using Agntcy.Slim;
 
-namespace SlimDemo.Alice.Common;
+namespace SlimDemo.Common;
 
 /// <summary>
 /// Shared SLIM setup for the Alice demo. Initializes Slim, creates app, connects, and subscribes.

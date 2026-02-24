@@ -1,6 +1,9 @@
-# SLIM Point-to-Point Demo — Odd/Even
+# SLIM .NET Demo
 
-Cross-language point-to-point demo: **Bob** (Go) sends random numbers to **Alice** (.NET), who replies with "odd" or "even". Showcases SLIM multi-language bindings.
+Two demos showcasing SLIM multi-language bindings:
+
+1. **Point-to-Point (Odd/Even)** — Bob (Go) sends random numbers to Alice (.NET), who replies "odd" or "even".
+2. **Group Chat (MLS)** — Multiple .NET GUI apps join an MLS-encrypted SLIM group to send and receive messages.
 
 ## Prerequisites
 
@@ -27,7 +30,7 @@ This will:
 - Install SLIM native libraries for Go via `slim-bindings-setup`
 - Download the `slimctl` binary (used to start the server without building the data-plane)
 
-## Running the Demo
+## Demo 1: Point-to-Point (Odd/Even)
 
 Open **three separate terminals**, all from the repo root:
 
@@ -129,3 +132,78 @@ task bob CLI_ARGS="--min 1 --max 1000 --iterations 20"
 | `--max` | `100` | Maximum random number |
 | `--server` | `http://localhost:46357` | SLIM server endpoint |
 | `--shared-secret` | `demo-shared-secret-min-32-chars!!` | Shared secret |
+
+---
+
+## Demo 2: Group Chat (MLS Encrypted)
+
+Multiple instances of the same .NET GUI app connect to a SLIM group with MLS encryption. One instance acts as the **moderator** (creates the group and invites others); the rest are **participants** (listen for invitations).
+
+### Running the Group Demo
+
+Open **three or more terminals** from the repo root.
+
+#### Terminal 1 -- SLIM Server
+
+```bash
+task server
+```
+
+#### Terminal 2 -- Moderator (Alice)
+
+```bash
+task group:gui
+```
+
+In the GUI:
+- **Identity**: `org/alice/v1`
+- **Group**: `org/demo/group1`
+- **Invite**: `org/bob/v1, org/carol/v1`
+- Click **Connect**, then **Join Group**
+
+#### Terminal 3 -- Participant (Bob)
+
+```bash
+task group:gui
+```
+
+In the GUI:
+- **Identity**: `org/bob/v1`
+- Leave **Invite** empty
+- Click **Connect**, then **Join Group** (waits for invitation from moderator)
+
+#### Terminal 4 -- Participant (Carol)
+
+```bash
+task group:gui
+```
+
+In the GUI:
+- **Identity**: `org/carol/v1`
+- Leave **Invite** empty
+- Click **Connect**, then **Join Group**
+
+### How It Works
+
+```mermaid
+flowchart TB
+  subgraph guis [GUI Instances]
+    G1["Alice (moderator)"]
+    G2["Bob (participant)"]
+    G3["Carol (participant)"]
+  end
+  subgraph slim [SLIM Server]
+    Server[slimctl :46357]
+  end
+  G1 -->|Create group + Invite| Server
+  G2 -->|Listen for invite| Server
+  G3 -->|Listen for invite| Server
+  G1 <-->|MLS messages| Server
+  G2 <-->|MLS messages| Server
+  G3 <-->|MLS messages| Server
+```
+
+- **Join**: The moderator creates the group session with `EnableMls = true` and invites listed participants. Participants call `ListenForSessionAsync()` and join when invited.
+- **Send/Receive**: All participants publish and receive messages through the shared MLS-encrypted session.
+- **Leave**: Click **Leave Group** to exit the session. The participants list updates for remaining members.
+- **Participant visibility**: The GUI periodically refreshes the participant list via `GetParticipants()` and logs join/leave events (best effort).

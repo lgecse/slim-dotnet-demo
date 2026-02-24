@@ -1,6 +1,6 @@
 using Agntcy.Slim;
 
-namespace SlimDemo.Alice.Common;
+namespace SlimDemo.Common;
 
 /// <summary>
 /// Shared session handling for the odd/even demo. Used by both CLI and GUI.

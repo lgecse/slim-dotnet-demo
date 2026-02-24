@@ -1,4 +1,4 @@
-namespace SlimDemo.Alice.Common;
+namespace SlimDemo.Common;
 
 /// <summary>
 /// Shared configuration for the Alice demo (CLI and GUI).

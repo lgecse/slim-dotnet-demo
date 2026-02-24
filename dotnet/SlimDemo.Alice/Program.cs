@@ -1,4 +1,4 @@
-using SlimDemo.Alice.Common;
+using SlimDemo.Common;
 
 namespace SlimDemo.Alice;
 

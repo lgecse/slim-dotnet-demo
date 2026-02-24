@@ -17,14 +17,16 @@ tasks:
     desc: "One-time setup: restore .NET packages, download Go deps, slimctl, install native libs"
     cmds:
       - echo "==> Restoring .NET packages..."
-      - dotnet restore dotnet/SlimDemo.Alice.sln
+      - dotnet restore dotnet/SlimDemo.sln
       - echo "==> Downloading Go dependencies..."
       - cd go && go mod download all
       - echo "==> Installing SLIM native libraries for Go (CGO)..."
       - cd go && go run github.com/agntcy/slim-bindings-go/cmd/slim-bindings-setup
       - task download:slimctl
       - echo ""
-      - echo "Setup complete! Run 'task server', 'task alice', and 'task bob' in separate terminals."
+      - 'echo "Setup complete!"'
+      - 'echo "  Point-to-point: task server, task alice, task bob"'
+      - 'echo "  Group chat:     task server, then task group:gui in multiple terminals"'
 
   download:slimctl:
     desc: "Download slimctl binary for current platform (no data-plane build needed)"
@@ -83,6 +85,12 @@ tasks:
     cmds:
       - dotnet run --project SlimDemo.Alice.Gui -- {{.CLI_ARGS}}
 
+  group:gui:
+    desc: "Run Group Chat GUI (.NET, MLS encrypted) — run multiple instances with different identities"
+    dir: dotnet
+    cmds:
+      - dotnet run --project SlimDemo.Group.Gui -- {{.CLI_ARGS}}
+
   bob:
     desc: "Run Bob (Go sender) (Terminal 3)"
     dir: go
@@ -94,8 +102,9 @@ tasks:
     cmds:
       - echo "==> Removing .NET bin/obj folders..."
       - rm -rf dotnet/SlimDemo.Alice/bin dotnet/SlimDemo.Alice/obj
-      - rm -rf dotnet/SlimDemo.Alice.Common/bin dotnet/SlimDemo.Alice.Common/obj
+      - rm -rf dotnet/SlimDemo.Common/bin dotnet/SlimDemo.Common/obj
       - rm -rf dotnet/SlimDemo.Alice.Gui/bin dotnet/SlimDemo.Alice.Gui/obj
+      - rm -rf dotnet/SlimDemo.Group.Gui/bin dotnet/SlimDemo.Group.Gui/obj
       - echo "==> Removing slimctl binary..."
       - rm -rf .bin
       - echo "==> Clearing NuGet cache (packages will be re-downloaded on install)..."

@@ -1,4 +1,4 @@
-namespace SlimDemo.Alice.Common;
+namespace SlimDemo.Common;
 
 /// <summary>
 /// Odd/even reply logic shared by CLI and GUI.

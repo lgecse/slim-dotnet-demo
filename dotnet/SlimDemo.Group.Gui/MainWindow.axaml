@@ -1,0 +1,82 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SlimDemo.Group.Gui.MainWindow"
+        Title="SLIM Group Chat"
+        Width="600" Height="600"
+        MinWidth="480" MinHeight="420">
+
+    <DockPanel Margin="16">
+        <!-- Header -->
+        <TextBlock DockPanel.Dock="Top"
+                   Text="SLIM Group Chat (MLS Encrypted)"
+                   FontSize="18" FontWeight="Bold" Margin="0,0,0,12" />
+
+        <!-- Status bar -->
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource SystemRegionBrush}"
+                CornerRadius="6" Padding="10,6" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Ellipse x:Name="StatusDot" Width="10" Height="10" Fill="Gray" />
+                <TextBlock x:Name="StatusText" Text="Disconnected" />
+            </StackPanel>
+        </Border>
+
+        <!-- Connection settings -->
+        <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,10">
+            <Grid ColumnDefinitions="Auto,8,*" RowDefinitions="Auto,6,Auto,6,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Identity:" VerticalAlignment="Center" FontWeight="SemiBold" />
+                <TextBox x:Name="IdentityInput" Grid.Row="0" Grid.Column="2"
+                         Watermark="org/alice/v1" Text="org/alice/v1" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Group:" VerticalAlignment="Center" FontWeight="SemiBold" />
+                <TextBox x:Name="GroupChannelInput" Grid.Row="2" Grid.Column="2"
+                         Watermark="org/demo/group1" Text="org/demo/group1" />
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Invite:" VerticalAlignment="Center" FontWeight="SemiBold" />
+                <TextBox x:Name="InviteListInput" Grid.Row="4" Grid.Column="2"
+                         Watermark="org/bob/v1, org/carol/v1 (moderator only)"
+                         TextChanged="OnInviteListChanged" />
+            </Grid>
+        </StackPanel>
+
+        <!-- Action buttons -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+            <Button x:Name="ConnectBtn" Content="Connect" Click="OnConnect" />
+            <Button x:Name="JoinBtn" Content="Create Group" Click="OnJoin" IsEnabled="False" />
+            <Button x:Name="LeaveBtn" Content="Leave Group" Click="OnLeave" IsEnabled="False" />
+            <Button x:Name="DisconnectBtn" Content="Disconnect" Click="OnDisconnect" IsEnabled="False" />
+        </StackPanel>
+
+        <!-- Participants -->
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource SystemRegionBrush}"
+                CornerRadius="6" Padding="8,4" Margin="0,0,0,6">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Participants:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <TextBlock x:Name="ParticipantsText" Text="(none)" VerticalAlignment="Center"
+                           FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12" />
+            </StackPanel>
+        </Border>
+
+        <!-- Message input -->
+        <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,8,Auto" Margin="0,8,0,0">
+            <TextBox x:Name="MessageInput" Grid.Column="0" Watermark="Type a message..."
+                     KeyDown="OnMessageKeyDown" IsEnabled="False" />
+            <Button x:Name="SendBtn" Grid.Column="2" Content="Send" Click="OnSend" IsEnabled="False" />
+        </Grid>
+
+        <!-- Message log -->
+        <Border CornerRadius="6" BorderBrush="{DynamicResource SystemBaseMediumLowColor}" BorderThickness="1">
+            <ScrollViewer x:Name="LogScroller">
+                <ItemsControl x:Name="MessageList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="6,2"
+                                       FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="13" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </DockPanel>
+</Window>
