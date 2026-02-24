@@ -159,7 +159,7 @@ In the GUI:
 - **Identity**: `org/alice/v1`
 - **Group**: `org/demo/group1`
 - **Invite**: `org/bob/v1, org/carol/v1`
-- Click **Connect**, then **Join Group**
+- Click **Connect**, then **Create Group**
 
 #### Terminal 3 -- Participant (Bob)
 
@@ -170,7 +170,7 @@ task group:gui
 In the GUI:
 - **Identity**: `org/bob/v1`
 - Leave **Invite** empty
-- Click **Connect**, then **Join Group** (waits for invitation from moderator)
+- Click **Connect** (automatically listens for invitations and joins when invited by the moderator)
 
 #### Terminal 4 -- Participant (Carol)
 
@@ -181,7 +181,7 @@ task group:gui
 In the GUI:
 - **Identity**: `org/carol/v1`
 - Leave **Invite** empty
-- Click **Connect**, then **Join Group**
+- Click **Connect** (automatically listens and joins when invited)
 
 ### How It Works
 
@@ -203,7 +203,7 @@ flowchart TB
   G3 <-->|MLS messages| Server
 ```
 
-- **Join**: The moderator creates the group session with `EnableMls = true` and invites listed participants. Participants call `ListenForSessionAsync()` and join when invited.
+- **Join**: The moderator clicks **Create Group** to start an MLS-encrypted session and invite listed participants. Participants automatically listen for invitations on connect and join without any extra clicks.
 - **Send/Receive**: All participants publish and receive messages through the shared MLS-encrypted session.
 - **Leave**: Click **Leave Group** to exit the session. The participants list updates for remaining members.
 - **Participant visibility**: The GUI periodically refreshes the participant list via `GetParticipants()` and logs join/leave events (best effort).
