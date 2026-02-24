@@ -38,7 +38,10 @@ func main() {
 
 	slim.InitializeWithDefaults()
 
-	localName := slim.NewName("org", "bob", "v1")
+	localName, err := slim.NameFromString("org/bob/v1")
+	if err != nil {
+		log.Fatalf("Failed to parse local name: %v", err)
+	}
 
 	app, err := slim.GetGlobalService().CreateAppWithSecret(localName, *sharedSecret)
 	if err != nil {

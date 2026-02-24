@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Agntcy.Slim" Version="0.0.5" />
+    <ProjectReference Include="..\..\..\slim\data-plane\bindings\dotnet\Slim\Slim.csproj" />
   </ItemGroup>
 
 </Project>

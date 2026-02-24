@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"strconv"
-	"strings"
 	"time"
 
 	slim "github.com/agntcy/slim-bindings-go"
@@ -38,7 +37,10 @@ func main() {
 
 	slim.InitializeWithDefaults()
 
-	localName := slim.NewName("org", "bob", "v1")
+	localName, err := slim.NameFromString("org/bob/v1")
+	if err != nil {
+		log.Fatalf("Failed to parse local name: %v", err)
+	}
 
 	app, err := slim.GetGlobalService().CreateAppWithSecret(localName, *sharedSecret)
 	if err != nil {
@@ -64,11 +66,10 @@ func main() {
 	fmt.Printf("  MLS      : %s\n", map[bool]string{true: "ENABLED", false: "disabled"}[enableMls])
 	fmt.Println()
 
-	remoteParts := strings.SplitN(*remote, "/", 3)
-	if len(remoteParts) != 3 {
-		log.Fatalf("Invalid remote %q — expected org/namespace/app", *remote)
+	remoteName, err := slim.NameFromString(*remote)
+	if err != nil {
+		log.Fatalf("Failed to parse remote name: %v", err)
 	}
-	remoteName := slim.NewName(remoteParts[0], remoteParts[1], remoteParts[2])
 
 	if err := app.SetRouteAsync(remoteName, connID); err != nil {
 		log.Fatalf("Failed to set route: %v", err)
