@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="SlimDemo.Group.Gui.MainWindow"
-        Title="SLIM Group Chat"
+        Title="SLIM Group Chat — .NET (C#)"
         Width="600" Height="600"
         MinWidth="480" MinHeight="420">
 

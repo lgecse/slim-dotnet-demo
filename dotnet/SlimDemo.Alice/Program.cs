@@ -9,15 +9,15 @@ class Program
         var server = GetArg(args, "--server") ?? DemoConfig.DefaultServer;
         var secret = GetArg(args, "--shared-secret") ?? DemoConfig.DefaultSecret;
 
-        Console.WriteLine("=== SLIM Demo: Alice (.NET Receiver) — MLS Encrypted ===");
+        Console.WriteLine("=== SLIM Demo: Alice (Receiver) — Odd/Even ===");
         Console.WriteLine();
+        Console.WriteLine($"  Language : .NET (C#)");
 
         var (app, connId) = AliceReceiver.CreateAndConnect(server, secret);
 
         Console.WriteLine($"  Identity : {DemoConfig.Identity}");
         Console.WriteLine($"  Server   : {server}");
         Console.WriteLine($"  Conn ID  : {connId}");
-        Console.WriteLine($"  MLS      : negotiated by sender");
         Console.WriteLine();
         Console.WriteLine("Waiting for incoming sessions from Bob...");
         Console.WriteLine();

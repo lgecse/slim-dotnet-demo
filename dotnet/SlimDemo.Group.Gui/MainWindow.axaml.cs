@@ -19,11 +19,17 @@ public partial class MainWindow : Window
     CancellationTokenSource? _cts;
     HashSet<string> _knownParticipants = new();
     string _identity = "";
+    bool _enableMls = true;
 
     public MainWindow()
     {
         InitializeComponent();
         MessageList.ItemsSource = _messages;
+
+        var args = Environment.GetCommandLineArgs();
+        _enableMls = !args.Contains("--no-mls");
+        if (!_enableMls)
+            Title = "SLIM Group Chat — .NET (C#) — MLS disabled";
     }
 
     void Log(string text)
@@ -177,7 +183,7 @@ public partial class MainWindow : Window
         var ct = _cts.Token;
 
         var invitees = inviteText.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        SetStatus("Creating group (MLS)...", Brushes.Orange);
+        SetStatus($"Creating group{(_enableMls ? " (MLS)" : "")}...", Brushes.Orange);
         Task.Run(() => RunModerator(groupChannel, invitees, ct), ct);
     }
 
@@ -256,10 +262,10 @@ public partial class MainWindow : Window
             var config = new SlimSessionConfig
             {
                 SessionType = SlimSessionType.Group,
-                EnableMls = true,
+                EnableMls = _enableMls,
             };
 
-            Log("Creating group session with MLS encryption...");
+            Log($"Creating group session{(_enableMls ? " with MLS encryption" : "")}...");
             _session = await _app!.CreateSessionAsync(channelName, config, ct);
             Log($"Group session created (ID: {_session.SessionId})");
 
@@ -280,7 +286,7 @@ public partial class MainWindow : Window
             }
 
             SetInGroupState();
-            SetStatus("In group (moderator, MLS)", Brushes.LimeGreen);
+            SetStatus($"In group (moderator{(_enableMls ? ", MLS" : "")})", Brushes.LimeGreen);
             Log("You are the moderator. Waiting for messages...");
 
             await ReceiveLoop(ct);
@@ -317,7 +323,7 @@ public partial class MainWindow : Window
                 Log($"Joined group session (ID: {_session.SessionId})");
 
                 SetInGroupState();
-                SetStatus("In group (participant, MLS)", Brushes.LimeGreen);
+                SetStatus($"In group (participant{(_enableMls ? ", MLS" : "")})", Brushes.LimeGreen);
 
                 await ReceiveLoop(ct);
 

@@ -53,10 +53,12 @@ Alice connects and waits for incoming sessions. For each number she receives, sh
 ### Terminal 3 — Bob (Go Sender)
 
 ```bash
-task bob
+task bob:go
 ```
 
-Bob creates a session to Alice, sends 10 random numbers (1–100), and prints Alice's odd/even replies.
+Bob creates an MLS-encrypted session to Alice, sends 10 random numbers (1–100), and prints Alice's odd/even replies. Use `--no-mls` to disable encryption.
+
+There is also a .NET Bob receiver available via `task bob`. MLS is on by default. Use `--no-mls` to disable encryption.
 
 ## Architecture
 
@@ -64,8 +66,8 @@ Bob creates a session to Alice, sends 10 random numbers (1–100), and prints Al
 flowchart LR
     subgraph windows [Demo Windows]
         T1[Terminal 1: Server]
-        T2[Terminal 2: Bob Go ]
-        T3[Window: Alice .NET - GUI]
+        T2[Terminal 2: Bob Go]
+        T3[Terminal 3: Alice .NET]
     end
     
     subgraph slim [SLIM Data-Plane]
@@ -111,8 +113,8 @@ Pass custom flags via `CLI_ARGS`:
 # Alice with a different server endpoint
 task alice CLI_ARGS="--server http://localhost:9090"
 
-# Bob with custom range and iterations
-task bob CLI_ARGS="--min 1 --max 1000 --iterations 20"
+# Bob (Go) with custom range and iterations
+task bob:go CLI_ARGS="--min 1 --max 1000 --iterations 20"
 ```
 
 ### Alice flags
@@ -122,7 +124,7 @@ task bob CLI_ARGS="--min 1 --max 1000 --iterations 20"
 | `--server` | `http://localhost:46357` | SLIM server endpoint |
 | `--shared-secret` | `demo-shared-secret-min-32-chars!!` | Shared secret |
 
-### Bob flags
+### Bob (Go) flags
 
 | Flag | Default | Description |
 |------|---------|-------------|
@@ -130,6 +132,15 @@ task bob CLI_ARGS="--min 1 --max 1000 --iterations 20"
 | `--iterations` | `10` | Number of numbers to send |
 | `--min` | `1` | Minimum random number |
 | `--max` | `100` | Maximum random number |
+| `--no-mls` | `false` | Disable MLS encryption |
+| `--server` | `http://localhost:46357` | SLIM server endpoint |
+| `--shared-secret` | `demo-shared-secret-min-32-chars!!` | Shared secret |
+
+### Bob (.NET) flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--no-mls` | `false` | Disable MLS encryption |
 | `--server` | `http://localhost:46357` | SLIM server endpoint |
 | `--shared-secret` | `demo-shared-secret-min-32-chars!!` | Shared secret |
 

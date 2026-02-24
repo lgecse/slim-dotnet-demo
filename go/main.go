@@ -32,8 +32,9 @@ func main() {
 
 	enableMls := !*noMls
 
-	fmt.Println("=== SLIM Demo: Bob (Go Sender) — Odd/Even ===")
+	fmt.Println("=== SLIM Demo: Bob (Sender) — Odd/Even ===")
 	fmt.Println()
+	fmt.Printf("  Language : Go\n")
 
 	slim.InitializeWithDefaults()
 

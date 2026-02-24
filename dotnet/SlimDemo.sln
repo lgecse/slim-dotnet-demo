@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -11,9 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimDemo.Alice.Gui", "SlimD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimDemo.Group.Gui", "SlimDemo.Group.Gui\SlimDemo.Group.Gui.csproj", "{B3C4D5E6-F7A8-9012-BCDE-F34567890ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimDemo.MlsTest", "SlimDemo.MlsTest\SlimDemo.MlsTest.csproj", "{E1A2B3C4-D5E6-F7A8-9012-BCDEF3456789}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimDemo.MlsTest.Bob", "SlimDemo.MlsTest.Bob\SlimDemo.MlsTest.Bob.csproj", "{76B3C118-BB44-4B8A-9675-49A6AA654AE5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlimDemo.Bob", "SlimDemo.Bob\SlimDemo.Bob.csproj", "{76B3C118-BB44-4B8A-9675-49A6AA654AE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,10 +38,6 @@ Global
 		{B3C4D5E6-F7A8-9012-BCDE-F34567890ABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3C4D5E6-F7A8-9012-BCDE-F34567890ABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3C4D5E6-F7A8-9012-BCDE-F34567890ABC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E1A2B3C4-D5E6-F7A8-9012-BCDEF3456789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E1A2B3C4-D5E6-F7A8-9012-BCDEF3456789}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E1A2B3C4-D5E6-F7A8-9012-BCDEF3456789}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E1A2B3C4-D5E6-F7A8-9012-BCDEF3456789}.Release|Any CPU.Build.0 = Release|Any CPU
 		{76B3C118-BB44-4B8A-9675-49A6AA654AE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{76B3C118-BB44-4B8A-9675-49A6AA654AE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76B3C118-BB44-4B8A-9675-49A6AA654AE5}.Release|Any CPU.ActiveCfg = Release|Any CPU

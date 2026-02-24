@@ -1,8 +1,7 @@
-using System.Text;
 using Agntcy.Slim;
 using SlimDemo.Common;
 
-namespace SlimDemo.MlsTest;
+namespace SlimDemo.Bob;
 
 class Program
 {
@@ -10,32 +9,32 @@ class Program
     {
         var server = GetArg(args, "--server") ?? DemoConfig.DefaultServer;
         var secret = GetArg(args, "--shared-secret") ?? DemoConfig.DefaultSecret;
-        var remote = GetArg(args, "--remote") ?? "org/bob/v1";
-        var iterations = int.TryParse(GetArg(args, "--iterations"), out var it) ? it : 10;
-        var minNum = int.TryParse(GetArg(args, "--min"), out var mn) ? mn : 1;
-        var maxNum = int.TryParse(GetArg(args, "--max"), out var mx) ? mx : 100;
-        var enableMls = HasFlag(args, "--enable-mls");
+        var remote = GetArg(args, "--remote") ?? "org/alice/v1";
+        var iterations = int.Parse(GetArg(args, "--iterations") ?? "10");
+        var minNum = int.Parse(GetArg(args, "--min") ?? "1");
+        var maxNum = int.Parse(GetArg(args, "--max") ?? "100");
+        var noMls = HasFlag(args, "--no-mls");
+        var enableMls = !noMls;
 
-        Console.WriteLine("=== SLIM MLS Test: Alice (.NET Sender) — Odd/Even ===");
+        Console.WriteLine("=== SLIM Demo: Bob (Sender) — Odd/Even ===");
         Console.WriteLine();
-        Console.WriteLine($"  Identity   : {DemoConfig.Identity}");
-        Console.WriteLine($"  Server     : {server}");
-        Console.WriteLine($"  Remote     : {remote}");
-        Console.WriteLine($"  Iterations : {iterations}");
-        Console.WriteLine($"  Range      : {minNum}–{maxNum}");
-        Console.WriteLine($"  MLS        : {(enableMls ? "ENABLED" : "disabled")}");
-        Console.WriteLine();
+        Console.WriteLine($"  Language : .NET (C#)");
 
         Slim.Initialize();
 
-        using var appName = SlimName.Parse(DemoConfig.Identity);
+        using var appName = SlimName.Parse("org/bob/v1");
         using var service = Slim.GetGlobalService();
         var app = service.CreateApp(appName, secret);
 
         var connId = Slim.Connect(server);
         app.Subscribe(app.Name, connId);
 
-        Console.WriteLine($"  Conn ID    : {connId}");
+        Console.WriteLine($"  Identity : org/bob/v1");
+        Console.WriteLine($"  Server   : {server}");
+        Console.WriteLine($"  Remote   : {remote}");
+        Console.WriteLine($"  Conn ID  : {connId}");
+        Console.WriteLine($"  Range    : {minNum}–{maxNum}");
+        Console.WriteLine($"  MLS      : {(enableMls ? "ENABLED" : "disabled")}");
         Console.WriteLine();
 
         using var remoteName = SlimName.Parse(remote);
@@ -49,29 +48,29 @@ class Program
         };
 
         Console.WriteLine($"Creating session to {remote}...");
-        using var session = await app.CreateSessionAsync(remoteName, config);
-        Console.WriteLine("Session created!");
+        var session = await app.CreateSessionAsync(remoteName, config);
+        Console.WriteLine("Ready!");
         Console.WriteLine();
 
         await Task.Delay(100);
 
         var rng = new Random();
-
         for (var i = 0; i < iterations; i++)
         {
             var n = rng.Next(minNum, maxNum + 1);
-            var payload = Encoding.UTF8.GetBytes(n.ToString());
+            var msg = n.ToString();
 
             try
             {
-                await session.PublishAsync(payload);
-                Console.WriteLine($"  >> Sent    : {n} ({i + 1}/{iterations})");
+                await session.PublishAsync(msg);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"  !! Error sending message {i + 1}/{iterations}: {ex.Message}");
                 continue;
             }
+
+            Console.WriteLine($"  >> Sent    : {n} ({i + 1}/{iterations})");
 
             try
             {
